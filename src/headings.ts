@@ -2,6 +2,7 @@ export interface IHeading {
   text: string;
   tag: string;
   layer: number;
+  element: HTMLElement;
 }
 
 const isHeading = (e: HTMLElement): boolean => {
@@ -13,24 +14,25 @@ export const getHeadings = (root: HTMLElement | null): IHeading[] => {
   const headings: IHeading[] = [];
   let currentHeading = "";
   let layer = 0;
-  const _walk = (p: HTMLElement) => {
-    if (!p) return;
+  const _walk = (el: HTMLElement) => {
+    if (!el) return;
 
-    if (isHeading(p)) {
-      if (currentHeading === "" || currentHeading >= p.tagName) {
-        currentHeading = p.tagName;
+    if (isHeading(el)) {
+      if (currentHeading === "" || currentHeading >= el.tagName) {
+        currentHeading = el.tagName;
         layer++;
       }
       if (currentHeading === "H1") {
-        currentHeading = p.tagName;
+        currentHeading = el.tagName;
       }
       headings.push({
-        text: p.innerText,
-        tag: p.tagName,
+        text: el.innerText,
+        tag: el.tagName,
         layer: layer,
+        element: el,
       });
     }
-    for (const c of Array.from(p.children)) {
+    for (const c of Array.from(el.children)) {
       if (c instanceof HTMLElement) {
         _walk(c);
       }

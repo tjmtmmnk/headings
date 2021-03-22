@@ -1,5 +1,4 @@
 const init = (tab: chrome.tabs.Tab) => {
-  console.log("init");
   chrome.tabs.insertCSS({
     code: `
   body {

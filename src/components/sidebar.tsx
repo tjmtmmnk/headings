@@ -14,41 +14,6 @@ const StyledSidebar = styled.div`
   padding-top: 20px;
 `;
 
-const partitionByLayer = (headings: IHeading[]) => {
-  const partitioned = new Map<number, IHeading[]>();
-  for (const h of headings) {
-    const v = partitioned.get(h.layer) ?? [];
-    v.push(h);
-    partitioned.set(h.layer, v);
-  }
-  const arrays: IHeading[][] = [];
-  const it = partitioned.entries();
-  while (1) {
-    const next = it.next();
-    if (next.done) break;
-    arrays.push(next.value[1]);
-  }
-  return arrays;
-};
-
-export const Sidebar = (props: { headings: IHeading[] }) => {
-  const { headings } = props;
-  const headingsByLayer = partitionByLayer(headings);
-  return (
-    <StyledSidebar>
-      {headingsByLayer.map((headings) => (
-        <>
-          -----
-          {headings.map((h) => (
-            <Item text={h.text} />
-          ))}
-          -----
-        </>
-      ))}
-    </StyledSidebar>
-  );
-};
-
 const StyledItem = styled.a<{ fontSize?: string }>`
   padding: 6px 8px 6px 16px;
   text-decoration: none;
@@ -61,7 +26,74 @@ const StyledItem = styled.a<{ fontSize?: string }>`
   }
 `;
 
-const Item = (props: { text: string; fontSize?: string }) => {
-  const { text, fontSize } = props;
-  return <StyledItem fontSize={fontSize}>{text}</StyledItem>;
+const partitionByLayer = (headings: IHeading[]) => {
+  const partitioned = new Map<number, IHeading[]>();
+  for (const h of headings) {
+    const v = partitioned.get(h.layer) ?? [];
+    v.push(h);
+    partitioned.set(h.layer, v);
+  }
+  const headingsByLayer: IHeading[][] = [];
+  const it = partitioned.entries();
+  while (1) {
+    const next = it.next();
+    if (next.done) break;
+    headingsByLayer.push(next.value[1]);
+  }
+  return headingsByLayer;
+};
+
+const calcFontSize = (heading: string) => {
+  switch (heading) {
+    case "H1":
+      return "16px;";
+    case "H2":
+      return "14px";
+    case "H3":
+      return "12px";
+    case "H4":
+      return "10px";
+    default:
+      return "10px";
+  }
+};
+
+export const Sidebar = (props: { headings: IHeading[] }) => {
+  const { headings } = props;
+  const headingsByLayer = partitionByLayer(headings);
+  return (
+    <StyledSidebar>
+      {headingsByLayer.map((headings) => (
+        <>
+          -----
+          {headings.map((h) => (
+            <Item
+              text={h.text}
+              fontSize={calcFontSize(h.tag)}
+              onClick={() => {
+                h.element.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }}
+            />
+          ))}
+          -----
+        </>
+      ))}
+    </StyledSidebar>
+  );
+};
+
+const Item = (props: {
+  text: string;
+  fontSize?: string;
+  onClick: () => void;
+}) => {
+  const { text, fontSize, onClick } = props;
+  return (
+    <StyledItem fontSize={fontSize} onClick={onClick}>
+      {text}
+    </StyledItem>
+  );
 };
