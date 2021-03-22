@@ -8,7 +8,6 @@ require("esbuild")
     target: "es2020",
     platform: "browser",
     entryPoints: [
-      path.join(srcDir, "popup.tsx"),
       path.join(srcDir, "options.tsx"),
       path.join(srcDir, "background.ts"),
       path.join(srcDir, "content_script.tsx"),
