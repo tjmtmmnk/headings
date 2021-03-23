@@ -1,12 +1,26 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { IHeading } from "../headings";
+import { ITreeHeading } from "../headings";
+import { makeStyles } from "@material-ui/core/styles";
+import TreeView from "@material-ui/lab/TreeView";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import TreeItem from "@material-ui/lab/TreeItem";
+
+const useStyles = makeStyles({
+  root: {
+    height: 240,
+    flexGrow: 1,
+    maxWidth: 350,
+    color: "white",
+  },
+});
 
 const StyledSidebar = styled.div`
   height: 100%;
   width: 360px;
   position: fixed;
-  z-index: 1;
+  z-index: 100;
   top: 0;
   left: 0;
   background-color: #111;
@@ -14,34 +28,17 @@ const StyledSidebar = styled.div`
   padding-top: 20px;
 `;
 
-const StyledItem = styled.a<{ fontSize?: string }>`
+const StyledItem = styled.span<{ fontSize?: string }>`
   padding: 6px 8px 6px 16px;
   text-decoration: none;
   font-size: ${(props) => props.fontSize || "12px"};
   color: #818181;
-  display: block;
+  display: inline;
 
   &:hover {
     color: #f1f1f1;
   }
 `;
-
-const partitionByLayer = (headings: IHeading[]) => {
-  const partitioned = new Map<number, IHeading[]>();
-  for (const h of headings) {
-    const v = partitioned.get(h.layer) ?? [];
-    v.push(h);
-    partitioned.set(h.layer, v);
-  }
-  const headingsByLayer: IHeading[][] = [];
-  const it = partitioned.entries();
-  while (1) {
-    const next = it.next();
-    if (next.done) break;
-    headingsByLayer.push(next.value[1]);
-  }
-  return headingsByLayer;
-};
 
 const calcFontSize = (heading: string) => {
   switch (heading) {
@@ -58,42 +55,49 @@ const calcFontSize = (heading: string) => {
   }
 };
 
-export const Sidebar = (props: { headings: IHeading[] }) => {
-  const { headings } = props;
-  const headingsByLayer = partitionByLayer(headings);
-  return (
-    <StyledSidebar>
-      {headingsByLayer.map((headings) => (
-        <>
-          -----
-          {headings.map((h) => (
-            <Item
-              text={h.text}
-              fontSize={calcFontSize(h.tag)}
-              onClick={() => {
-                h.element.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }}
-            />
-          ))}
-          -----
-        </>
-      ))}
-    </StyledSidebar>
-  );
+const scrollTo = (element: HTMLElement) => {
+  element.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
 };
 
-const Item = (props: {
-  text: string;
-  fontSize?: string;
-  onClick: () => void;
-}) => {
-  const { text, fontSize, onClick } = props;
+export const Sidebar = (props: { headings: ITreeHeading[] }) => {
+  const { headings } = props;
+  const classes = useStyles();
   return (
-    <StyledItem fontSize={fontSize} onClick={onClick}>
-      {text}
-    </StyledItem>
+    <StyledSidebar>
+      <TreeView
+        className={classes.root}
+        defaultCollapseIcon={<ExpandMoreIcon />}
+        defaultExpandIcon={<ChevronRightIcon />}
+      >
+        {headings.map((heading, i) => {
+          return (
+            <TreeItem
+              nodeId={`${i}`}
+              label={heading.node.text}
+              onLabelClick={() => {
+                scrollTo(heading.node.element);
+              }}
+            >
+              {heading.children.map((child, j) => {
+                return (
+                  <a onClick={() => {}}>
+                    <TreeItem
+                      nodeId={`${(i + 1) * 1000 + j}`}
+                      label={child.text}
+                      onLabelClick={() => {
+                        scrollTo(child.element);
+                      }}
+                    />
+                  </a>
+                );
+              })}
+            </TreeItem>
+          );
+        })}
+      </TreeView>
+    </StyledSidebar>
   );
 };
