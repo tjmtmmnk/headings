@@ -1,20 +1,29 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { ITreeHeading } from "../headings";
-import { makeStyles } from "@material-ui/core/styles";
 import TreeView from "@material-ui/lab/TreeView";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import TreeItem from "@material-ui/lab/TreeItem";
 
-const useStyles = makeStyles({
-  root: {
-    height: 240,
-    flexGrow: 1,
-    maxWidth: 350,
-    color: "white",
-  },
-});
+const StyledTreeView = styled(TreeView)`
+  height: 100%;
+  flex-grow: 1;
+  color: white;
+`;
+
+const StyledTreeItem = styled(({ fontSize: string, ...other }) => (
+  <TreeItem {...other} />
+))`
+  .MuiTypography-root {
+    font-size: ${(props) => props.fontSize};
+    color: #818181;
+
+    &:hover {
+      color: #f1f1f1;
+    }
+  }
+`;
 
 const StyledSidebar = styled.div`
   height: 100%;
@@ -28,18 +37,6 @@ const StyledSidebar = styled.div`
   padding-top: 20px;
 `;
 
-const StyledItem = styled.span<{ fontSize?: string }>`
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: ${(props) => props.fontSize || "12px"};
-  color: #818181;
-  display: inline;
-
-  &:hover {
-    color: #f1f1f1;
-  }
-`;
-
 const calcFontSize = (heading: string) => {
   switch (heading) {
     case "H1":
@@ -47,11 +44,11 @@ const calcFontSize = (heading: string) => {
     case "H2":
       return "14px";
     case "H3":
-      return "12px";
+      return "13px";
     case "H4":
-      return "10px";
+      return "12px";
     default:
-      return "10px";
+      return "12px";
   }
 };
 
@@ -64,40 +61,41 @@ const scrollTo = (element: HTMLElement) => {
 
 export const Sidebar = (props: { headings: ITreeHeading[] }) => {
   const { headings } = props;
-  const classes = useStyles();
   return (
     <StyledSidebar>
-      <TreeView
-        className={classes.root}
+      <StyledTreeView
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
       >
         {headings.map((heading, i) => {
           return (
-            <TreeItem
+            <StyledTreeItem
+              key={i}
               nodeId={`${i}`}
               label={heading.node.text}
               onLabelClick={() => {
                 scrollTo(heading.node.element);
               }}
+              fontSize={calcFontSize(heading.node.tag)}
             >
               {heading.children.map((child, j) => {
+                const id = (i + 1) * 1000 + j;
                 return (
-                  <a onClick={() => {}}>
-                    <TreeItem
-                      nodeId={`${(i + 1) * 1000 + j}`}
-                      label={child.text}
-                      onLabelClick={() => {
-                        scrollTo(child.element);
-                      }}
-                    />
-                  </a>
+                  <StyledTreeItem
+                    key={id}
+                    nodeId={`${id}`}
+                    label={child.text}
+                    onLabelClick={() => {
+                      scrollTo(child.element);
+                    }}
+                    fontSize={calcFontSize(child.tag)}
+                  />
                 );
               })}
-            </TreeItem>
+            </StyledTreeItem>
           );
         })}
-      </TreeView>
+      </StyledTreeView>
     </StyledSidebar>
   );
 };
