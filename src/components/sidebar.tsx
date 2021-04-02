@@ -1,22 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import { ITreeHeading } from "../headings";
 import TreeView from "@material-ui/lab/TreeView";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import TreeItem from "@material-ui/lab/TreeItem";
+import { v4 as uuidv4 } from "uuid";
+import { INode } from "../headings";
 
 const StyledTreeView = styled(TreeView)`
-  height: 100%;
-  flex-grow: 1;
   color: white;
 `;
 
-const StyledTreeItem = styled(({ fontSize: string, ...other }) => (
-  <TreeItem {...other} />
-))`
+const StyledTreeItem = styled(TreeItem)`
   .MuiTypography-root {
-    font-size: ${(props) => props.fontSize};
     color: #818181;
 
     &:hover {
@@ -37,21 +33,6 @@ const StyledSidebar = styled.div`
   padding-top: 20px;
 `;
 
-const calcFontSize = (heading: string) => {
-  switch (heading) {
-    case "H1":
-      return "16px;";
-    case "H2":
-      return "14px";
-    case "H3":
-      return "13px";
-    case "H4":
-      return "12px";
-    default:
-      return "12px";
-  }
-};
-
 const scrollTo = (element: HTMLElement) => {
   element.scrollIntoView({
     behavior: "smooth",
@@ -59,43 +40,45 @@ const scrollTo = (element: HTMLElement) => {
   });
 };
 
-export const Sidebar = (props: { headings: ITreeHeading[] }) => {
-  const { headings } = props;
+const Node = (props: { node: INode }) => {
+  const { node } = props;
+  if (node.children.length === 0) {
+    return (
+      <StyledTreeItem
+        key={uuidv4()}
+        nodeId={uuidv4()}
+        label={node.element.text}
+        onLabelClick={() => {
+          scrollTo(node.element.value);
+        }}
+      />
+    );
+  }
+  return (
+    <StyledTreeView>
+      <StyledTreeItem
+        key={uuidv4()}
+        nodeId={uuidv4()}
+        label={node.element.text}
+        onLabelClick={() => {
+          scrollTo(node.element.value);
+        }}
+      >
+        {node.children.map((c) => {
+          return <Node node={c} key={uuidv4()} />;
+        })}
+      </StyledTreeItem>
+    </StyledTreeView>
+  );
+};
+
+export const Sidebar = (props: { nodes: INode[] }) => {
+  const { nodes } = props;
   return (
     <StyledSidebar>
-      <StyledTreeView
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
-      >
-        {headings.map((heading, i) => {
-          return (
-            <StyledTreeItem
-              key={i}
-              nodeId={`${i}`}
-              label={heading.node.text}
-              onLabelClick={() => {
-                scrollTo(heading.node.element);
-              }}
-              fontSize={calcFontSize(heading.node.tag)}
-            >
-              {heading.children.map((child, j) => {
-                const id = (i + 1) * 1000 + j;
-                return (
-                  <StyledTreeItem
-                    key={id}
-                    nodeId={`${id}`}
-                    label={child.text}
-                    onLabelClick={() => {
-                      scrollTo(child.element);
-                    }}
-                    fontSize={calcFontSize(child.tag)}
-                  />
-                );
-              })}
-            </StyledTreeItem>
-          );
-        })}
-      </StyledTreeView>
+      {nodes.map((n) => {
+        return <Node node={n} key={uuidv4()} />;
+      })}
     </StyledSidebar>
   );
 };

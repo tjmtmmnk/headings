@@ -9,4 +9,4 @@ root.id = "headingsRoot";
 body?.insertAdjacentElement("beforebegin", root);
 
 const headings = getHeadings(body);
-ReactDOM.render(<Sidebar headings={headings} />, root);
+ReactDOM.render(<Sidebar nodes={headings} />, root);
