@@ -18,6 +18,7 @@ const StyledTreeItem = styled(TreeItem)`
     &:hover {
       color: #f1f1f1;
     }
+    font-size: 12px;
   }
 `;
 
@@ -55,7 +56,10 @@ const Node = (props: { node: INode }) => {
     );
   }
   return (
-    <StyledTreeView>
+    <StyledTreeView
+      defaultCollapseIcon={<ExpandMoreIcon />}
+      defaultExpandIcon={<ChevronRightIcon />}
+    >
       <StyledTreeItem
         key={uuidv4()}
         nodeId={uuidv4()}

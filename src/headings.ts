@@ -12,15 +12,16 @@ export interface INode {
   children: INode[];
 }
 
-interface ITemp {
+interface IHeading {
   text: string;
   layer: number;
+  tagName: string;
   element: HTMLElement;
 }
 
 export const getHeadings = (root: HTMLElement | null): INode[] => {
   if (!root) return [];
-  const headings: ITemp[] = [];
+  const headings: IHeading[] = [];
   let currentHeading = "";
   let layer = 0;
   const _walk = (el: HTMLElement) => {
@@ -36,6 +37,7 @@ export const getHeadings = (root: HTMLElement | null): INode[] => {
       }
       headings.push({
         text: el.innerText,
+        tagName: el.tagName,
         layer: layer,
         element: el,
       });
@@ -49,8 +51,8 @@ export const getHeadings = (root: HTMLElement | null): INode[] => {
 
   _walk(root);
 
-  const _partitionByLayer = (headings: ITemp[]): INode[] => {
-    const partitioned = new Map<number, ITemp[]>();
+  const _partitionByLayer = (headings: IHeading[]): INode[] => {
+    const partitioned = new Map<number, IHeading[]>();
     for (const h of headings) {
       const v = partitioned.get(h.layer) ?? [];
       v.push(h);
@@ -64,27 +66,34 @@ export const getHeadings = (root: HTMLElement | null): INode[] => {
       if (next.done) {
         break;
       }
+      const heads = next.value;
+      if (!heads.length) {
+        break;
+      }
+
       const root: INode = {
         element: {
-          value: document.createElement("h1"),
-          text: "aaaaaaa",
+          value: heads[0].element,
+          text: heads[0].text,
         },
         children: [],
       };
-      const heads = next.value;
-      let last = root;
-      for (const current of heads) {
+      let lastTagName = heads[0].tagName;
+      let ch = root.children;
+      for (const current of heads.slice(1)) {
         // current: H2, last: H1
-        if (current.text > last.element.text) {
-          last.children.push({
+        if (current.tagName > lastTagName) {
+          const newch: INode[] = [];
+          ch.push({
             element: {
               value: current.element,
               text: current.text,
             },
-            children: [],
+            children: newch,
           });
+          ch = newch;
         } else {
-          root.children.push({
+          ch.push({
             element: {
               value: current.element,
               text: current.text,
@@ -92,14 +101,9 @@ export const getHeadings = (root: HTMLElement | null): INode[] => {
             children: [],
           });
         }
-        last = {
-          element: {
-            value: current.element,
-            text: current.text,
-          },
-          children: [],
-        };
+        lastTagName = current.tagName;
       }
+      console.log(root);
       headingsByLayer.push(root);
     }
     return headingsByLayer;
