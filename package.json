@@ -8,6 +8,7 @@
     "watch": "node build.js",
     "clean": "rimraf dist",
     "test": "npx jest",
+    "test-watch": "npx jest --watch",
     "style": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "author": "",
