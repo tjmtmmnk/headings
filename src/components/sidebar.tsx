@@ -26,7 +26,7 @@ const StyledSidebar = styled.div`
   height: 100%;
   width: 360px;
   position: fixed;
-  z-index: 100;
+  z-index: 100000;
   top: 0;
   left: 0;
   background-color: #111;
