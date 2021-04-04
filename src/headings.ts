@@ -19,7 +19,8 @@ interface IHeading {
   element: HTMLElement;
 }
 
-export const getHeadings = (root: HTMLElement | null): INode[] => {
+// return: root of headings tree
+export const getHeadingsRoot = (root: HTMLElement | null): INode => {
   const rootNode: INode = {
     element: {
       value: document.createElement("div"),
@@ -27,7 +28,7 @@ export const getHeadings = (root: HTMLElement | null): INode[] => {
     },
     children: [],
   };
-  if (!root) return [rootNode];
+  if (!root) return rootNode;
 
   const headings: IHeading[] = [];
   let layer = 0;
@@ -100,5 +101,5 @@ export const getHeadings = (root: HTMLElement | null): INode[] => {
   };
 
   _partitionByLayer(rootNode, headings);
-  return [rootNode];
+  return rootNode;
 };
