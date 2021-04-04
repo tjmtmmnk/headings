@@ -84,24 +84,17 @@ export const getHeadings = (root: HTMLElement | null): INode[] => {
       for (let i = 1; i < heads.length; i++) {
         const current = heads[i];
         // e.g current: H1, next: H2
+        const newCh: INode[] = [];
+        ch.push({
+          element: {
+            value: current.element,
+            text: current.text,
+          },
+          children: newCh,
+        });
+
         if (current.tagName < nextTagName) {
-          const newch: INode[] = [];
-          ch.push({
-            element: {
-              value: current.element,
-              text: current.text,
-            },
-            children: newch,
-          });
-          ch = newch;
-        } else {
-          ch.push({
-            element: {
-              value: current.element,
-              text: current.text,
-            },
-            children: [],
-          });
+          ch = newCh;
         }
         nextTagName = heads[i + 1]?.tagName ?? "";
       }
