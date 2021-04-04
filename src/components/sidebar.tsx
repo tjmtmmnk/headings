@@ -55,14 +55,16 @@ const Node = (props: { node: INode }) => {
       />
     );
   }
+  const rootTreeItemId = uuidv4();
   return (
     <StyledTreeView
       defaultCollapseIcon={<ExpandMoreIcon />}
       defaultExpandIcon={<ChevronRightIcon />}
+      defaultExpanded={[rootTreeItemId]}
     >
       <StyledTreeItem
         key={uuidv4()}
-        nodeId={uuidv4()}
+        nodeId={rootTreeItemId}
         label={node.element.text}
         onLabelClick={() => {
           scrollTo(node.element.value);
