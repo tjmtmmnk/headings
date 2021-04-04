@@ -78,11 +78,13 @@ export const getHeadings = (root: HTMLElement | null): INode[] => {
         },
         children: [],
       };
-      let lastTagName = heads[0].tagName;
+
+      let nextTagName = heads[2]?.tagName ?? "";
       let ch = root.children;
-      for (const current of heads.slice(1)) {
-        // current: H2, last: H1
-        if (current.tagName > lastTagName) {
+      for (let i = 1; i < heads.length; i++) {
+        const current = heads[i];
+        // e.g current: H1, next: H2
+        if (current.tagName < nextTagName) {
           const newch: INode[] = [];
           ch.push({
             element: {
@@ -101,9 +103,8 @@ export const getHeadings = (root: HTMLElement | null): INode[] => {
             children: [],
           });
         }
-        lastTagName = current.tagName;
+        nextTagName = heads[i + 1]?.tagName ?? "";
       }
-      console.log(root);
       headingsByLayer.push(root);
     }
     return headingsByLayer;
