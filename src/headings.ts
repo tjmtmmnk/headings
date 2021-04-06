@@ -32,12 +32,13 @@ export const getHeadingsRoot = (root: HTMLElement | null): INode => {
 
   const headings: IHeading[] = [];
   let layer = 0;
-  let parentElement: HTMLElement | null;
+  let lastHeading = "";
   const _walk = (el: HTMLElement) => {
     if (!el) return;
 
     if (isHeading(el)) {
-      if (parentElement !== el.parentElement) {
+      // e.g last: H2, current: H1
+      if (lastHeading === "" || lastHeading > el.tagName) {
         layer++;
       }
       headings.push({
@@ -46,8 +47,8 @@ export const getHeadingsRoot = (root: HTMLElement | null): INode => {
         layer: layer,
         element: el,
       });
+      lastHeading = el.tagName;
     }
-    parentElement = el.parentElement;
     for (const c of Array.from(el.children)) {
       if (c instanceof HTMLElement) {
         _walk(c);
@@ -93,7 +94,7 @@ export const getHeadingsRoot = (root: HTMLElement | null): INode => {
         // e.g current: H1, next: H2
         if (current.tagName < nextTagName) {
           ch = newCh;
-        } else {
+        } else if (current.tagName > nextTagName) {
           ch = root.children;
         }
       }
