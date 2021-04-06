@@ -5,7 +5,7 @@
 visualize HTML headings chrome extension
 
 This is result from `demo/demo.html`.
-![](docs/demo.png)
+![](demo/demo.png)
 
 # Project Structure
 
