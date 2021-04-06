@@ -1,9 +1,11 @@
-# Chrome Extension TypeScript Starter
+# headings
 
 [![build](https://github.com/tjmtmmnk/headings/actions/workflows/build.yml/badge.svg)](https://github.com/tjmtmmnk/headings/actions/workflows/build.yml)
 
-# headings
 visualize HTML headings chrome extension
+
+This is result from `demo/demo.html`.
+![](docs/demo.png)
 
 # Project Structure
 
@@ -13,7 +15,6 @@ visualize HTML headings chrome extension
 * dist/js: Generated JavaScript files
 
 ---
-![](docs/demo.png)
 ## Setup
 
 ```
